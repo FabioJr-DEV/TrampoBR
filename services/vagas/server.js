@@ -21,20 +21,33 @@ app.get('/health', (req, res) => res.json({ servico: 'vagas', status: 'ok' }));
 app.get(base, async (req, res) => {
   try {
     let q = {};
-    if (req.query.busca) {
-      const re = new RegExp(String(req.query.busca).replace(/[^a-zA-Z0-9À-ÿ ]/g, ''), 'i');
-      q.$or = ["titulo", "descricao", "requisitos", "localizacao"].map(k => ({ [k]: re }));
-    }
-    if (req.query.status) q.status = req.query.status;
-    if (req.query.modalidade) q.modalidade = req.query.modalidade;
-    if (req.query.empresaId) q.empresaId = req.query.empresaId;
     
+    // Força o parâmetro a virar texto puro para evitar o erro de ".trim is not a function"
+    const buscaTexto = req.query.busca ? String(req.query.busca).trim() : '';
+    
+    // Filtro de busca por texto por título ou descrição (Apenas se houver texto digitado)
+    if (buscaTexto !== '') {
+      const re = new RegExp(buscaTexto.replace(/[^a-zA-Z0-9À-ÿ ]/g, ''), 'i');
+      q.$or = [{ titulo: re }, { descricao: re }];
+    }
+    
+    // Só aplica o filtro de modalidade se o usuário escolheu uma opção válida no site
+    if (req.query.modalidade && String(req.query.modalidade).trim() !== '') {
+      q.modalidade = String(req.query.modalidade).trim();
+    }
+    
+    // Só aplica o status se ele vier preenchido do front-end
+    if (req.query.status && String(req.query.status).trim() !== '') {
+      q.status = String(req.query.status).trim();
+    }
+
     let rows = await Model.find(q).sort({ createdAt: -1 }).lean();
     res.json(rows);
   } catch (e) {
     fail(res, e);
   }
 });
+
 
 app.get(base + '/:id', async (req, res) => {
   try {

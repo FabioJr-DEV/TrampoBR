@@ -56,20 +56,30 @@ async function rodarSeed() {
 
     // Criando Vagas vinculadas às empresas criadas acima (usando o ID gerado pelo MongoDB)
     console.log('Inserindo vagas disponíveis...');
+        // No seu scripts/seed.js, substitua o array vagasDados por este:
     const vagasDados = [
       { 
         titulo: "Desenvolvedor(a) Fullstack Junior", 
         descricao: "Vaga para atuar com Node.js e React", 
         empresaId: empresasCriadas[0]._id, 
-        salario: 4500 
+        salario: 4500,
+        modalidade: "Remoto",
+        area: "Tecnologia",
+        status: "ABERTA",
+        cidade: "São Paulo"
       },
       { 
         titulo: "Gerente de Projetos", 
         descricao: "Coordenação de times ágeis de desenvolvimento", 
         empresaId: empresasCriadas[1]._id, 
-        salario: 8000 
+        salario: 8000,
+        modalidade: "Híbrido",
+        area: "Tecnologia",
+        status: "ABERTA",
+        cidade: "Porto Alegre"
       }
     ];
+
     const vagasCriadas = await Vaga.insertMany(vagasDados);
 
     // Criando Candidaturas vinculando os Candidatos às Vagas criadas acima
