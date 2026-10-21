@@ -36,7 +36,6 @@ app.get(base, async (req, res) => {
     // Só aplica o status se ele vier preenchido do front-end
     if (req.query.status && req.query.status.trim() !== '') {
       q.status = req.query.status;
->>>>>>> Sprint-Vagas
     }
 
     let rows = await Model.find(q).sort({ createdAt: -1 }).lean();
