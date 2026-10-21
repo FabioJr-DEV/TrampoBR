@@ -5,6 +5,6 @@ const VagaSchema = new mongoose.Schema({
   descricao: { type: String, required: true },
   empresaId: { type: mongoose.Schema.Types.ObjectId, required: true },
   salario: { type: Number, required: true }
-}, { collection: 'TRAMPOBR' });
+}, { collection: 'vagas' }); // Força o plural minúsculo
 
 module.exports = mongoose.model('Vaga', VagaSchema);

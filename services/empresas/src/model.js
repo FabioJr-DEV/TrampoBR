@@ -9,6 +9,6 @@ const EmpresaSchema = new mongoose.Schema({
   site: { type: String },
   descricao: { type: String },
   ramo: { type: String, required: false }
-}); // <-- REMOVA o ', { collection: 'TRAMPOBR' }' daqui
+}, { collection: 'empresas' }); // Força o plural minúsculo
 
 module.exports = mongoose.model('Empresa', EmpresaSchema);

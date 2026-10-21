@@ -1,32 +1,23 @@
 const path = require('path');
 const mongoose = require('mongoose');
 
-// 1. Definição dos Schemas forçando a inserção na única coleção 'TRAMPOBR' do seu print
+// Altere apenas o início do seu scripts/seed.js para incluir as coleções explícitas:
 const Empresa = mongoose.model('Empresa', new mongoose.Schema({
-  nome: String,
-  cnpj: String,
-  ramo: String
-}), 'TRAMPOBR');
+  nome: String, cnpj: String, ramo: String
+}), 'empresas');
 
 const Candidato = mongoose.model('Candidato', new mongoose.Schema({
-  nome: String,
-  email: String,
-  curriculo: String
-}), 'TRAMPOBR');
+  nome: String, email: String, curriculo: String
+}), 'candidatos');
 
 const Vaga = mongoose.model('Vaga', new mongoose.Schema({
-  titulo: String,
-  descricao: String,
-  empresaId: mongoose.Schema.Types.ObjectId,
-  salario: Number
-}), 'TRAMPOBR');
+  titulo: String, descricao: String, empresaId: mongoose.Schema.Types.ObjectId, salario: Number
+}), 'vagas');
 
 const Candidatura = mongoose.model('Candidatura', new mongoose.Schema({
-  vagaId: mongoose.Schema.Types.ObjectId,
-  candidatoId: mongoose.Schema.Types.ObjectId,
-  status: String,
-  dataCandidatura: { type: Date, default: Date.now }
-}), 'TRAMPOBR');
+  vagaId: mongoose.Schema.Types.ObjectId, candidatoId: mongoose.Schema.Types.ObjectId, status: String, dataCandidatura: { type: Date, default: Date.now }
+}), 'candidaturas');
+
 
 // 2. Dados Iniciais para popular o Banco
 const empresasDados = [

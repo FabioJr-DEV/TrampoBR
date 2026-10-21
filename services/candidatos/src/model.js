@@ -8,6 +8,6 @@ const CandidatoSchema = new mongoose.Schema({
   habilidades: { type: String },
   curriculo: { type: String, required: false },
   urlCurriculo: { type: String }
-}); // <-- REMOVA o ', { collection: 'TRAMPOBR' }' daqui
+}, { collection: 'candidatos' }); // Força o plural minúsculo
 
 module.exports = mongoose.model('Candidato', CandidatoSchema);
