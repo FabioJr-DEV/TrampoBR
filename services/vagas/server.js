@@ -21,13 +21,17 @@ app.get('/health', (req, res) => res.json({ servico: 'vagas', status: 'ok' }));
 app.get(base, async (req, res) => {
   try {
     let q = {};
-    if (req.query.busca) {
+    
+    // Filtro de busca por texto (Apenas se o usuário digitar algo)
+    if (req.query.busca && req.query.busca.trim() !== '') {
       const re = new RegExp(String(req.query.busca).replace(/[^a-zA-Z0-9À-ÿ ]/g, ''), 'i');
       q.$or = ["titulo", "descricao", "requisitos", "localizacao"].map(k => ({ [k]: re }));
     }
-    if (req.query.status) q.status = req.query.status;
-    if (req.query.modalidade) q.modalidade = req.query.modalidade;
-    if (req.query.empresaId) q.empresaId = req.query.empresaId;
+    
+    // Filtros adicionais (Apenas se vierem preenchidos do front-end)
+    if (req.query.status && req.query.status.trim() !== '') q.status = req.query.status;
+    if (req.query.modalidade && req.query.modalidade.trim() !== '') q.modalidade = req.query.modalidade;
+    if (req.query.empresaId && req.query.empresaId.trim() !== '') q.empresaId = req.query.empresaId;
     
     let rows = await Model.find(q).sort({ createdAt: -1 }).lean();
     res.json(rows);
@@ -35,6 +39,7 @@ app.get(base, async (req, res) => {
     fail(res, e);
   }
 });
+
 
 app.get(base + '/:id', async (req, res) => {
   try {
