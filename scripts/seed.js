@@ -32,7 +32,6 @@ const Candidatura = mongoose.model('Candidatura', new mongoose.Schema({
   status: String,
   dataCandidatura: { type: Date, default: Date.now }
 }), 'candidaturas');
->>>>>>> Sprint-Dados
 
 // 2. Dados Iniciais
 const empresasDados = [
