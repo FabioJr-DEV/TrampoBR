@@ -22,24 +22,28 @@ app.get(base, async (req, res) => {
   try {
     let q = {};
     
-    // Filtro de busca por texto (Apenas se o usuário digitar algo)
+    // Filtro de busca por texto por título ou descrição
     if (req.query.busca && req.query.busca.trim() !== '') {
       const re = new RegExp(String(req.query.busca).replace(/[^a-zA-Z0-9À-ÿ ]/g, ''), 'i');
-      q.$or = ["titulo", "descricao", "requisitos", "localizacao"].map(k => ({ [k]: re }));
+      q.$or = [{ titulo: re }, { descricao: re }];
     }
     
-    // Filtros adicionais (Apenas se vierem preenchidos do front-end)
-    if (req.query.status && req.query.status.trim() !== '') q.status = req.query.status;
-    if (req.query.modalidade && req.query.modalidade.trim() !== '') q.modalidade = req.query.modalidade;
-    if (req.query.empresaId && req.query.empresaId.trim() !== '') q.empresaId = req.query.empresaId;
+    // Só aplica o filtro de modalidade se o usuário escolheu uma opção válida (diferente de vazio)
+    if (req.query.modalidade && req.query.modalidade.trim() !== '') {
+      q.modalidade = req.query.modalidade;
+    }
     
+    // Só aplica o status se ele vier preenchido do front-end
+    if (req.query.status && req.query.status.trim() !== '') {
+      q.status = req.query.status;
+    }
+
     let rows = await Model.find(q).sort({ createdAt: -1 }).lean();
     res.json(rows);
   } catch (e) {
     fail(res, e);
   }
 });
-
 
 app.get(base + '/:id', async (req, res) => {
   try {
