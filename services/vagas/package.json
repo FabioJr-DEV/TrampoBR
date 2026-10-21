@@ -1,0 +1,12 @@
+{
+  "name": "vagastech-vagas",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.8",
+    "mongoose": "^9.11.2"
+  }
+}
