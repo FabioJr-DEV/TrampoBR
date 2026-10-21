@@ -22,23 +22,21 @@ app.get(base, async (req, res) => {
   try {
     let q = {};
     
-    // Força o parâmetro a virar texto puro para evitar o erro de ".trim is not a function"
-    const buscaTexto = req.query.busca ? String(req.query.busca).trim() : '';
-    
-    // Filtro de busca por texto por título ou descrição (Apenas se houver texto digitado)
-    if (buscaTexto !== '') {
-      const re = new RegExp(buscaTexto.replace(/[^a-zA-Z0-9À-ÿ ]/g, ''), 'i');
+    // Filtro de busca por texto por título ou descrição
+    if (req.query.busca && req.query.busca.trim() !== '') {
+      const re = new RegExp(String(req.query.busca).replace(/[^a-zA-Z0-9À-ÿ ]/g, ''), 'i');
       q.$or = [{ titulo: re }, { descricao: re }];
     }
     
-    // Só aplica o filtro de modalidade se o usuário escolheu uma opção válida no site
-    if (req.query.modalidade && String(req.query.modalidade).trim() !== '') {
-      q.modalidade = String(req.query.modalidade).trim();
+    // Só aplica o filtro de modalidade se o usuário escolheu uma opção válida (diferente de vazio)
+    if (req.query.modalidade && req.query.modalidade.trim() !== '') {
+      q.modalidade = req.query.modalidade;
     }
     
     // Só aplica o status se ele vier preenchido do front-end
-    if (req.query.status && String(req.query.status).trim() !== '') {
-      q.status = String(req.query.status).trim();
+    if (req.query.status && req.query.status.trim() !== '') {
+      q.status = req.query.status;
+>>>>>>> Sprint-Vagas
     }
 
     let rows = await Model.find(q).sort({ createdAt: -1 }).lean();
