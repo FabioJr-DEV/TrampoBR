@@ -1,74 +1,135 @@
 # TrampoBR — Projeto Integrador SENAI
 
-Plataforma fullstack de vagas e candidaturas inspirada no protótipo enviado. Backend com **quatro microserviços independentes** Express/Mongoose, comunicação HTTP REST e gateway. Frontend HTML5/CSS3/JavaScript com Skeleton CSS local e `fetch`.
+## Descrição
 
-## Pré-requisitos
-- Node.js 20+ e npm
-- MongoDB local na porta 27017, ou Docker Desktop (`docker compose up -d`)
+O TrampoBR é uma plataforma de vagas de emprego desenvolvida como projeto integrador do SENAI. O sistema permite consultar empresas, visualizar vagas, cadastrar candidatos e gerenciar candidaturas.
 
-## Executar
-1. Abra a pasta `TrampoBR_Fullstack` no terminal.
-2. Copie `.env.example` para `.env` (Windows: `copy .env.example .env`).
-3. Execute `npm install`.
-4. Inicie MongoDB localmente ou com `docker compose up -d`.
-5. Execute `npm run seed` para criar registros de exemplo (opcional).
-6. Execute `npm run dev`.
-7. Abra **http://localhost:3000**.
+O projeto utiliza uma arquitetura baseada em microsserviços, com APIs REST desenvolvidas em Node.js e Express, integração com MongoDB por meio do Mongoose e uma interface web construída com HTML, CSS e JavaScript.
 
-**Importante:** `npm start` inicia somente o gateway; para a aplicação completa use `npm run dev`.
+## Tecnologias utilizadas
 
-## Arquitetura
+- **Backend:** Node.js e Express
+- **Banco de dados:** MongoDB Atlas
+- **ODM:** Mongoose
+- **Frontend:** HTML5, CSS3 e JavaScript
+- **Estilização:** Skeleton CSS
+- **Comunicação com a API:** Fetch API
+- **Arquitetura:** Microsserviços com API Gateway
+
+## Requisitos
+
+- Node.js versão 20 ou superior
+- npm
+- Conta e cluster configurados no MongoDB Atlas
+- Conexão com a internet para acessar o banco de dados
+
+## Como executar o projeto
+
+1. Abra a pasta raiz do projeto `TrampoBR_Fullstack`.
+2. Instale as dependências necessárias com `npm install`, conforme a configuração de cada serviço.
+3. Configure a string de conexão do MongoDB Atlas nos arquivos de configuração dos serviços, utilizando suas próprias credenciais.
+4. Verifique se o IP de acesso está autorizado no MongoDB Atlas e se o usuário do banco possui as permissões necessárias.
+5. Inicie os serviços conforme os scripts disponíveis no `package.json`.
+6. Com os serviços em execução, acesse o gateway pelo navegador:
+
+   `http://localhost:3000`
+
+**Observação:** a porta 3000 corresponde ao API Gateway. Os demais serviços utilizam portas próprias.
+
+## Arquitetura do projeto
+
+O sistema está organizado em quatro microsserviços e um API Gateway:
+
+```text
+TrampoBR
+│
+├── API Gateway
+│   └── Porta 3000
+│
+├── Serviço de Empresas
+│   └── Porta 3101
+│
+├── Serviço de Vagas
+│   └── Porta 3102
+│
+├── Serviço de Candidatos
+│   └── Porta 3103
+│
+├── Serviço de Candidaturas
+│   └── Porta 3104
+│
+└── MongoDB Atlas
+    ├── empresas
+    ├── vagas
+    ├── candidatos
+    └── candidaturas
 ```
-Browser (frontend) -> Gateway :3000 -> Empresas :3101 -> MongoDB
-                                  -> Vagas :3102 -> MongoDB
-                                  -> Candidatos :3103 -> MongoDB
-                                  -> Candidaturas :3104 -> MongoDB
-```
-Os serviços de vagas e candidaturas verificam entidades relacionadas via HTTP/REST. Cada serviço tem seu próprio `server.js` e model Mongoose; as coleções são distintas em um banco compartilhado (simplificação acadêmica).
 
-## API REST
-Base no gateway: `http://localhost:3000/api`.
+O API Gateway centraliza as requisições do frontend e as encaminha aos serviços correspondentes. Cada microsserviço possui suas próprias rotas e utiliza o MongoDB para persistência dos dados.
 
-| Recurso | Métodos | Caminho |
-|---|---|---|
-| Empresas | GET, POST | `/empresas` |
-| Empresas | GET, PUT, DELETE | `/empresas/:id` |
-| Vagas | GET, POST | `/vagas` |
-| Vagas | GET, PUT, DELETE | `/vagas/:id` |
-| Candidatos | GET, POST | `/candidatos` |
-| Candidatos | GET, PUT, DELETE | `/candidatos/:id` |
-| Candidaturas | GET, POST | `/candidaturas` |
-| Candidaturas | GET, PUT, DELETE | `/candidaturas/:id` |
+## Endpoints da API
 
-`GET /vagas?busca=backend&modalidade=Remoto` filtra vagas. `GET /candidaturas?vagaId=...` filtra candidaturas. HTTP: 200 sucesso, 201 criado, 204 excluído, 400 inválido, 404 ausente, 409 candidatura duplicada, 500 falha inesperada.
+As requisições são realizadas por meio do API Gateway, utilizando o endereço-base:
 
-### Exemplo de requisição
-```json
-POST /api/empresas
-{"nome":"Empresa Exemplo","cnpj":"12345678000195","email":"contato@exemplo.com","telefone":"51999999999","cidade":"Porto Alegre"}
-```
+`http://localhost:3000/api`
 
-## Testes
-- `npm test` — Jest + Supertest + MongoDB Memory Server (o primeiro uso pode baixar binário MongoDB).
-- `npm run test:e2e` — Cypress (requer aplicação e MongoDB iniciados).
+| Recurso | Endpoint |
+|---|---|
+| Empresas | `/api/empresas` |
+| Vagas | `/api/vagas` |
+| Candidatos | `/api/candidatos` |
+| Candidaturas | `/api/candidaturas` |
 
-## Telas
-Home, lista de vagas, detalhes, empresas (cadastro e listagem), cadastro/edição de vaga, cadastro/edição de candidato, lista de candidatos, candidatura, dashboard.
+Os endpoints disponibilizam operações de consulta e gerenciamento dos respectivos recursos, conforme as rotas implementadas em cada serviço.
+
+## Banco de dados
+
+O projeto utiliza o MongoDB Atlas como banco de dados em nuvem.
+
+As coleções utilizadas pelo sistema são:
+
+- `empresas`: armazena os dados das empresas.
+- `vagas`: armazena as informações das vagas de emprego.
+- `candidatos`: armazena os dados dos candidatos.
+- `candidaturas`: armazena as candidaturas vinculadas aos candidatos e às vagas.
+
+O serviço de candidaturas utiliza a coleção `candidaturas`, evitando a consulta indevida à coleção antiga `TRAMPOBR`, que reunia documentos de diferentes tipos.
+
+Para que os relacionamentos funcionem corretamente, os campos `candidatoId` e `vagaId` de cada candidatura devem corresponder aos identificadores dos registros existentes nas coleções `candidatos` e `vagas`.
+
+## Funcionalidades
+
+- Cadastro e consulta de empresas.
+- Cadastro e consulta de vagas.
+- Cadastro e consulta de candidatos.
+- Registro e consulta de candidaturas.
+- Integração entre frontend, API Gateway e microsserviços.
+- Persistência dos dados no MongoDB Atlas.
+- Visualização das informações por meio das páginas do sistema e do dashboard.
+
+## Interface do sistema
+
+O frontend utiliza HTML, CSS e JavaScript para apresentar as páginas e consumir as APIs do backend.
+
+A comunicação com os serviços é realizada por meio de requisições HTTP utilizando a Fetch API. A interface utiliza o Skeleton CSS para auxiliar na organização e estilização dos elementos.
 
 ## Observações
-- Login/autenticação são desafios extras do PDF e **não foram implementados**. Não exponha o sistema à internet sem autenticação e autorização.
-- Upload de arquivo PDF não foi implementado; currículo pode ser informado por URL, como no desafio extra.
-- O layout usa a imagem como inspiração, não uma cópia pixel a pixel.
-- Dependências devem ser instaladas em uma máquina com acesso ao npm. Caso a rede corporativa tenha proxy/certificado próprio, solicite a cadeia CA à TI, sem desativar a validação TLS.
 
+- Os microsserviços devem estar em execução para que as funcionalidades dependentes das APIs funcionem corretamente.
+- A conexão com o MongoDB Atlas deve ser configurada com credenciais válidas.
+- Não publique senhas, strings de conexão ou outras credenciais no repositório.
+- Os identificadores utilizados nas candidaturas devem corresponder aos registros existentes de candidatos e vagas.
+- As funcionalidades descritas correspondem à estrutura e às implementações identificadas no projeto.
 
-## Correção do erro "Falha na requisição"
-O gateway foi corrigido para encaminhar `/api/vagas` para `http://localhost:3102/vagas` (e os outros serviços da mesma forma). Antes, o proxy podia remover o prefixo, causando 404.
+## Solução de problemas
 
-1. Inicie o MongoDB (Windows: `services.msc` → MongoDB Server → Iniciar).
-2. Na raiz do projeto execute `npm.cmd install` e `npm.cmd run dev`.
-3. Em outro terminal execute `npm.cmd run seed` para inserir exemplos (com os serviços ligados).
-4. Acesse http://localhost:3000 e http://localhost:3000/api/health.
-5. Teste http://localhost:3000/api/vagas (deve retornar JSON).
+### Falha na requisição
 
-Se o MongoDB estiver desligado, o gateway agora informa qual serviço não está disponível em vez de uma falha genérica.
+Se o frontend apresentar erros ao carregar os dados:
+
+1. Verifique se o API Gateway está em execução na porta 3000.
+2. Confirme se o microsserviço responsável pelo recurso solicitado está funcionando.
+3. Verifique a conexão com o MongoDB Atlas e as credenciais configuradas.
+4. Teste os endpoints diretamente pelo navegador ou por uma ferramenta de requisições HTTP.
+5. Confira os logs do serviço correspondente para identificar possíveis erros.
+6. Se uma candidatura não apresentar os dados do candidato ou da vaga, confira se os valores de `candidatoId` e `vagaId` correspondem aos `_id` existentes nas coleções corretas.
